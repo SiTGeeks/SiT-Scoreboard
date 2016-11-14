@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SIT Scoreboard Umpire</title>
+<script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<style type="text/css">
+body {
+	text-align: center;
+	overflow-x: hidden;
+}	
+	
+.A-sch-code, .B-sch-code {
+	font-size: 3em;
+}
+
+.A-plus, .A-minus, .B-plus, .B-minus {
+	font-size: 3em;
+	background: #CCC;
+	width: 50%;
+	margin: auto;
+}
+
+.A-score, .B-score {
+	font-size: 4em;
+}
+
+.match-number {
+	font-size: 2em;
+}
+
+.match-type {
+	font-size: 2em;
+}
+
+.versus {
+	font-size: 5em;
+	font-weight: bold;
+}
+
+.A-set-plus, .A-set-minus, .B-set-plus, .B-set-minus {
+	font-size: 2em;
+	background: #CCC;
+}
+
+.A-set-score, .B-set-score {
+	font-size: 3em;
+}
+
+.btn-big {
+	padding: 18px 28px;
+	font-size: 22px;
+	border-radius: 8px;
+}
+
+.btn-xl {
+	padding: 30px 70px 30px;
+	font-size: 30px;
+	border-radius: 10px;
+	margin: 10px;
+}
+
+.btn-function {
+	margin: 5px 5px 5px -1px;
+	width: 100%;
+}
+
+
+</style>
+</head>
+
+<body>
+<div class="navbar bg-primary"></div>
+
+<div class="row">
+	<div class="col-sm-4" id = "majorA">
+		<div class="A-sch-code">SIT</div>
+		<button id="plusA" type="button" class="btn btn-big btn-success">+</button><br />
+		<button id="A-current-score" type="button" class="btn btn-xl btn-outline-primary" disabled>7</button><br />
+		<button id="minusA" type="button" class="btn btn-big btn-danger">-</button>
+	</div>
+	<div class="col-sm-4" >
+		<!-- A set score -->
+		<div class="col-sm-3" id = "minorA">
+			<button id="A-set-plus" type="button" class="btn btn-lg btn-success">+</button><br />
+			<div id="A-set-score" class="A-set-score">0</div>
+			<button id="A-set-minus" type="button" class="btn btn-lg btn-danger">-</button>
+		</div>
+		<div class="col-sm-6">
+			<div class="match-number">xxxx</div>
+			<div class="versus">VS</div>
+		</div>
+		<div class="col-sm-3" id = minorB>
+			<!-- B set score -->
+			<button id="B-set-plus" type="button" class="btn btn-lg btn-success">+</button><br />
+			<div id="B-set-score" class="B-set-score">1</div>
+			<button id="B-set-minus" type="button" class="btn btn-lg btn-danger">-</button>
+		</div>
+		<div class="col-sm-12">
+			<button id="toggleSides" type="button" class="btn btn-big btn-primary btn-function">Switch Side</button><br />
+		</div>
+		<br />
+		<div class="col-sm-12">
+			<button id="newSets" type="button" class="btn btn-big btn-primary btn-function">New Set</button>
+		</div>
+	</div>
+	<div class="col-sm-4" id= majorB>
+		<div class="B-sch-code">NTU</div>
+		<button id="plusB" type="button" class="btn btn-big btn-success">+</button><br />
+		<button id="B-current-score" type="button" class="btn btn-xl btn-outline-primary" disabled>5</button><br />
+		<button id="minusB" type="button" class="btn btn-big btn-danger">-</button>
+	</div>
+</div>
+</body>
+</html>
+<script>
+	//Declare Visual Variables
+	var teamASchCode = document.querySelector('.A-sch-code');
+	var teamAScore = document.querySelector('#A-current-score');
+	var teamAplus = document.querySelector('#plusA');
+	var teamAminus = document.querySelector('#minusA');
+	var teamASetScore = document.querySelector('#A-set-score');
+	var teamASetPlus = document.querySelector('#A-set-plus');
+	var teamASetMinus = document.querySelector('#A-set-minus');
+
+	var toggleSwitch = document.querySelector('#toggleSides');
+	var newSets = document.querySelector('#newSets');
+	var newGame = document.querySelector('#newGame');
+
+	var teamBSchCode = document.querySelector('.B-sch-code');
+	var teamBScore = document.querySelector('#B-current-score');
+	var teamBplus = document.querySelector('#plusB');
+	var teamBminus = document.querySelector('#minusB');
+	var teamBSetScore = document.querySelector('.B-set-score');
+	var teamBSetPlus = document.querySelector('#B-set-plus');
+	var teamBSetMinus = document.querySelector('#B-set-minus');
+
+	//Declare Hidden Variables
+	var currentGameSet = document.querySelector('.current-game-set');
+	var currentSide = document.querySelector('.currentSide');
+	var gameStatus = document.querySelector('.gameStatus');
+	var gameType = document.querySelector('.match-number');
+	
+	var currentToggle = false;
+	//var cowID = "cow1";
+	var cowID = localStorage.getItem("cowID");
+	alert(cowID);
+
+	// Initialize Firebase
+	var config = {
+		apiKey: "AIzaSyDD_xwwUaL9QqUmr3e5qRWrBkyLLnjk0Io",
+		authDomain: "sitscore.firebaseapp.com",
+		databaseURL: "https://sitscore.firebaseio.com",
+		storageBucket: "sitscore.appspot.com",
+	};
+	firebase.initializeApp(config);
+	
+	var myFirebase = firebase.database().ref();
+
+	loadDisplay(cowID);
+	//Retrieve and Display details from Firebase based on COW ID
+	function loadDisplay(cowID){
+		var gameRef = firebase.database().ref(cowID);
+		gameRef.on('value',function(snapshot) {
+			// body...
+			var key = snapshot.key;
+			var obj = snapshot.val();
+			
+			toggleUI(obj.gameToggle);
+			currentToggle = obj.gameToggle;
+			currentGameSet = obj.gameCurrentSet;
+			currentSide = obj.gameToggle;		
+
+			gameType.innerHTML = obj.gameGender + " <br /> " + obj.gameType;
+
+			teamASchCode.innerHTML = obj.teamASchCode;
+			teamASetScore.innerHTML = obj.teamAScore;
+
+			teamBSchCode.innerHTML = obj.teamBSchCode;
+			teamBSetScore.innerHTML = obj.teamBScore;
+
+			updateCurrentSetScore(obj.gameCurrentSet , obj.set1 , obj.set2 , obj.set3 , obj.set4 , obj.set5);
+		});
+	}
+
+	function updateCurrentSetScore(gameCurrentSet, set1,set2,set3,set4,set5){
+		switch(gameCurrentSet){
+			case 1:
+					teamAScore.innerHTML = set1.teamASetScore;
+					teamBScore.innerHTML = set1.teamBSetScore;
+					break;
+			case 2:
+					teamAScore.innerHTML = set2.teamASetScore;
+					teamBScore.innerHTML = set2.teamBSetScore;
+					break;
+			case 3:
+					teamAScore.innerHTML = set3.teamASetScore;
+					teamBScore.innerHTML = set3.teamBSetScore;
+					break;
+			case 4:
+					teamAScore.innerHTML = set4.teamASetScore;
+					teamBScore.innerHTML = set4.teamBSetScore;
+					break;
+			case 5:
+					teamAScore.innerHTML = set5.teamASetScore;
+					teamBScore.innerHTML = set5.teamBSetScore;
+					break;
+		}
+
+	}
+
+	//Team A Score function
+	teamAplus.addEventListener("click", function() {
+		var currentScore = parseInt(document.getElementById('A-current-score').innerHTML);
+		var updates = {};
+		updates['/' + cowID + '/set' + currentGameSet + '/teamASetScore'] = currentScore + 1;
+		firebase.database().ref().update(updates);
+	});
+
+	teamAminus.addEventListener("click", function(){
+		var currentScore = parseInt(document.getElementById('A-current-score').innerHTML);
+		var updates = {};
+
+		if(currentScore > 0){
+			updates['/' + cowID + '/set' + currentGameSet + '/teamASetScore'] = currentScore - 1;
+			firebase.database().ref().update(updates);
+		}
+		
+	});
+
+	teamASetPlus.addEventListener("click", function() {
+		var currentSetScore = parseInt(document.getElementById('A-set-score').innerHTML);
+		var updates = {};
+		updates['/' + cowID + '/teamAScore'] = currentSetScore + 1;
+		firebase.database().ref().update(updates);
+	});
+
+	teamASetMinus.addEventListener("click", function(){
+		var currentSetScore = parseInt(document.getElementById('A-set-score').innerHTML);
+		var updates = {};
+		if(currentSetScore > 0){
+			updates['/' + cowID + '/teamAScore'] = currentSetScore - 1;
+			firebase.database().ref().update(updates);
+		}
+	});
+
+	//Team B Score function
+	teamBplus.addEventListener("click", function() {
+		var currentScore = parseInt(document.getElementById('B-current-score').innerHTML);
+		var updates = {};
+		updates['/' + cowID + '/set' + currentGameSet + '/teamBSetScore'] = currentScore + 1;
+		firebase.database().ref().update(updates);
+	});
+
+	teamBminus.addEventListener("click", function() {
+		var currentScore = parseInt(document.getElementById('B-current-score').innerHTML);
+		var updates = {};
+		if(currentScore > 0){
+			updates['/' + cowID + '/set' + currentGameSet + '/teamBSetScore'] = currentScore - 1;
+			firebase.database().ref().update(updates);
+		}
+	});
+
+	teamBSetPlus.addEventListener("click",function(){
+		var currentSetScore = parseInt(document.getElementById('B-set-score').innerHTML);
+		var updates = {};
+		updates['/' + cowID + '/teamBScore'] = currentSetScore + 1;
+		firebase.database().ref().update(updates);
+	});
+
+	teamBSetMinus.addEventListener("click", function() {
+		var currentSetScore = parseInt(document.getElementById('B-set-score').innerHTML);
+		var updates = {};
+		if(currentSetScore > 0){
+			updates['/' + cowID + '/teamBScore'] = currentSetScore - 1;
+			firebase.database().ref().update(updates);
+		}
+	});
+
+	//Sub functions
+	toggleSwitch.addEventListener("click", function(){
+		if(Boolean(currentSide)){
+			var x = false;
+			var updates = {};
+			updates['/' + cowID + '/gameToggle'] = x;
+			firebase.database().ref().update(updates);
+			
+		}else{
+			var x = true;
+			var updates = {};
+			updates['/' + cowID + '/gameToggle'] = x;
+			firebase.database().ref().update(updates);
+			
+		}
+	});
+
+	newSets.addEventListener("click", function(){
+		var x = currentGameSet;
+		var updates = {};
+		if(x < 5){
+			updates['/' + cowID + '/gameCurrentSet'] = x + 1;
+			firebase.database().ref().update(updates);
+		} else{
+			alert("All 5 set had been played");
+		}
+		
+	});
+	
+	
+	var skip = true;
+	function toggleUI(gameToggle)
+	{
+		if (!skip || gameToggle)//logic for skipping if first time + special exception if game toggle is needed to be skipped
+		{
+			if (currentToggle != gameToggle)
+			{
+				var majorA = document.querySelector('#majorA');
+				var majorB = document.querySelector('#majorB');
+				
+				var minorA = document.querySelector('#minorA');
+				var minorB = document.querySelector('#minorB');
+				
+				swapElements(majorA,majorB);
+				swapElements(minorA,minorB)
+				
+			}
+		}
+		skip = false;
+	}
+	function swapElements(obj1, obj2) {
+    // save the location of obj2
+		var parent2 = obj2.parentNode;
+		var next2 = obj2.nextSibling;
+		// special case for obj1 is the next sibling of obj2
+		if (next2 === obj1) {
+			// just put obj1 before obj2
+			parent2.insertBefore(obj1, obj2);
+		} else {
+			// insert obj2 right before obj1
+			obj1.parentNode.insertBefore(obj2, obj1);
+
+			// now insert obj1 where obj2 was
+			if (next2) {
+				// if there was an element after obj2, then insert obj1 right before that
+				parent2.insertBefore(obj1, next2);
+			} else {
+				// otherwise, just append as last child
+				parent2.appendChild(obj1);
+			}
+		}
+	}
+
+</script>

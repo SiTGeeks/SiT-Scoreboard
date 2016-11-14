@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>COW Selection</title>
+<script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+
+<style type="text/css">
+body {
+  text-align: center;
+  overflow-x: hidden;
+} 
+  
+.btn-big {
+  padding: 18px 28px;
+  font-size: 22px;
+  border-radius: 8px;
+}
+
+.btn-xl {
+  padding: 30px 70px 30px;
+  font-size: 30px;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+</style>
+</head>
+<body>
+<div class="navbar bg-primary">
+<!-- insert anything in header -->
+</div>
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-xs-3">
+      <!-- Single button -->
+      <div class="btn-group">
+        <button id="btnCOW" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          COWS <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a onclick="selectCOW('1')" href="#">1</a></li>
+          <li><a onclick="selectCOW('2')" href="#">2</a></li>
+          <li><a onclick="selectCOW('3')" href="#">3</a></li>
+          <li><a onclick="selectCOW('4')" href="#">4</a></li>
+          <li><a onclick="selectCOW('5')" href="#">5</a></li>
+          <li><a onclick="selectCOW('6')" href="#">6</a></li>
+          <li><a onclick="selectCOW('7')" href="#">6</a></li>
+          <li><a onclick="selectCOW('8')" href="#">6</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-xs-6">
+      <button type="button" class="btn btn-danger" onclick="selection()">Select</button>
+    </div>
+  </div>
+</div>
+</body>
+
+<script>
+   function selectCOW(number){
+      var btnText = document.querySelector('#btnCOW');
+      btnText.innerHTML = number;
+   }
+
+   function selection(){
+      var btnText = document.querySelector('#btnCOW');
+      var cowID = "cow" + btnText.innerHTML;
+      localStorage.setItem("cowID", cowID);
+      alert(cowID);
+      window.location = "umpireScore.html";
+   }
+</script>

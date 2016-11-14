@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<style type="text/css">
+.game-type {
+	background-color: #555555	;
+    color: white;	
+	
+}
+.game-win{
+	background-color: #80ffe5;
+}
+.game-col{
+	width:50%
+}
+.game-btn-col{
+	width:40%
+}
+.table-centered {
+	margin: auto;
+	width:80%;
+}
+.navbar {
+	margin-bottom: 0px;
+}
+
+.navbar-bg {
+	background: #000000;
+}
+
+.header-banner {
+	line-height: 1.6em;
+	font-size: 2em;
+	color: #FFF;
+}
+.footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 60px;	
+}
+
+.footer-left, .footer-right {
+	color: #FFF;
+	font-size: 1.4vw;
+	padding-top: 10px;
+}
+
+.footer-left {
+	float: left;
+	padding-left: 20px;
+}
+
+.footer-right {
+	float: right;
+	padding-right: 20px;
+}
+
+.footer-img {
+	width: 4vw;
+}
+body {
+	text-align: center;
+	overflow: hidden;
+}
+</style>
+<head>
+    <meta charset="UTF-8">
+    <title>Score System</title>
+</head>
+
+<body>
+<div class="row">
+	<div class="col-lg-12">
+		<div class="navbar navbar-bg">
+			<!-- <a class="navbar-brand" href="#">Welcome to SUniG Table Tennis</a> -->
+			<div class="header-banner">
+				Scores!
+			</div>		
+
+		</div>		
+	</div>
+</div>
+	<div>
+		<div class="row">
+			<div  class="col-md-12"><h1>Entrance</h1></div>
+		</div>
+		<div class="row">
+			<div id = "cow8" class="col-md-6">COW8</div>
+			<div id = "cow6" class="col-md-6">COW6</div>
+		</div>
+		<div class="row">
+			<div id = "cow7" class="col-md-6">COW7</div>
+			<div id = "cow5" class="col-md-6">COW5</div>
+		</div>
+		<div class="row">
+			<div id = "cow4" class="col-md-6">COW4</div>
+			<div id = "cow2" class="col-md-6">COW2</div>
+		</div>
+		<div class="row">
+			<div id = "cow3" class="col-md-6">COW3</div>
+			<div id = "cow1" class="col-md-6">COW1</div>
+		</div>
+		<div class="row">
+			<div  class="col-md-12"><h1>Stage</h1></div>
+		</div>
+	</div>
+	
+	<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+	<script>
+		  // Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyDD_xwwUaL9QqUmr3e5qRWrBkyLLnjk0Io",
+			authDomain: "sitscore.firebaseapp.com",
+			databaseURL: "https://sitscore.firebaseio.com",
+			storageBucket: "sitscore.appspot.com",
+		};
+		firebase.initializeApp(config);
+		
+		var myFirebase = firebase.database().ref();
+		
+        var game = myFirebase;
+		
+		var postButton = document.querySelector('#addGame');
+		
+		
+		
+        game.on('child_added', function(snapshot) {
+            var object = snapshot.val();
+			var key = snapshot.key;
+            var html = 	'<table class="table-bordered table-condensed center text-center table-centered" >'+
+						'	<tr>'+
+						'		<td id = "'+key+'gameTypeGender" class = "game-type" colspan="2"></td>'+
+						'	</tr>'+
+						'	<tr>'+
+						'		<td class = "game-col">'+
+						'			<select id = "'+key+'teamASchCode" class="form-control">'+
+						'			  <option value="NUS">NUS</option>'+
+						'			  <option value="NTU">NTU</option>'+
+						'			  <option value="SIT">SIT</option>'+
+						'			  <option value="SUTD">SUTD</option>'+
+						'			  <option value="SIM">SIM</option>'+
+						'			  <option value="SMU">SMU</option>'+
+						'			</select>'+
+						'		</td>'+
+						'		<td class = "game-col">'+
+						'			<select id = "'+key+'teamBSchCode" class="form-control">'+
+						'			  <option value="NUS">NUS</option>'+
+						'			  <option value="NTU">NTU</option>'+
+						'			  <option value="SIT">SIT</option>'+
+						'			  <option value="SUTD">SUTD</option>'+
+						'			  <option value="SIM">SIM</option>'+
+						'			  <option value="SMU">SMU</option>'+
+						'			</select>'+
+						'		</td>'+
+						'	</tr>'+
+						'	<tr>'+
+						'		<td id = "'+key+'teamAScore" class = "game-col"></td>'+
+						'		<td id = "'+key+'teamBScore" class = "game-col"></td>'+
+						'	</tr>'+
+						'	<tr>'+
+						'		<td class = "game-col"><input id="'+key+'teamAPlayer1Name" class="form-control" type="text" ></input></td>'+
+						'		<td class = "game-col"><input id="'+key+'teamBPlayer1Name" class="form-control" type="text" ></input></td>'+
+						'	</tr>'+
+						'	<tr>'+
+						'		<td class = "game-col"><input id="'+key+'teamAPlayer2Name" class="form-control" type="text" ></input></td>'+
+						'		<td class = "game-col"><input id="'+key+'teamBPlayer2Name" class="form-control" type="text" ></input></td>'+
+						'	</tr>'+
+						'	<tr>'+
+						'		<td colspan="2"><button class="btn btn-primary game-btn-col" onclick = updateGame("'+key+'")>Update</button><button class="btn btn-danger game-btn-col" onclick = resetGame("'+key+'")>Reset</button></td>'+
+						'	</tr>'+
+						'</table>';
+						
+            var newNode = document.querySelector('#'+key);
+			newNode.id = key;
+			newNode.innerHTML = html;
+			newNode.className += " form-group"
+			
+			
+			SetInnerHTMLValue(key+"gameTypeGender",key+" : " +object.gameGender+" - "+object.gameType);
+			
+			SetValue(key+"teamAPlayer1Name",object.teamAPlayer1Name);
+			SetValue(key+"teamAPlayer2Name",object.teamAPlayer2Name);
+			SetValue(key+"teamASchCode",object.teamASchCode);
+			SetInnerHTMLValue(key+"teamAScore",object.teamAScore);
+			
+			SetValue(key+"teamBPlayer1Name",object.teamBPlayer1Name);
+			SetValue(key+"teamBPlayer2Name",object.teamBPlayer2Name);
+			SetValue(key+"teamBSchCode",object.teamBSchCode);
+			SetInnerHTMLValue(key+"teamBScore",object.teamBScore);
+			
+		});
+		function SetInnerHTMLValue(id,valueToSelect)
+		{    
+			var dropList = document.getElementById(id);
+			dropList.innerHTML = valueToSelect;
+		}
+		function SetValue(id,valueToSelect)
+		{    
+			var element = document.getElementById(id);
+			element.value = valueToSelect;
+		}
+		
+		game.on('child_changed', function(snapshot) {
+            
+			var key = snapshot.key;
+			var object = snapshot.val();
+			
+			SetInnerHTMLValue(key+"gameTypeGender",key+" : " +object.gameGender+" - "+object.gameType);
+			
+			SetValue(key+"teamAPlayer1Name",object.teamAPlayer1Name);
+			SetValue(key+"teamAPlayer2Name",object.teamAPlayer2Name);
+			SetValue(key+"teamASchCode",object.teamASchCode);
+			SetInnerHTMLValue(key+"teamAScore",object.teamAScore);
+			
+			SetValue(key+"teamBPlayer1Name",object.teamBPlayer1Name);
+			SetValue(key+"teamBPlayer2Name",object.teamBPlayer2Name);
+			SetValue(key+"teamBSchCode",object.teamBSchCode);
+			SetInnerHTMLValue(key+"teamBScore",object.teamBScore);
+			
+		});
+		
+		game.on('child_removed', function(snapshot) {
+			var key = snapshot.key;
+			var object = snapshot.val();
+			var html = object.gameName+" has been deleted";
+			document.querySelector("#"+key).innerHTML = html;
+		});
+		
+		
+		function updateGame(key){
+			var teamASchCode = document.querySelector('#'+key+'teamASchCode');
+			var teamBSchCode = document.querySelector('#'+key+'teamBSchCode');
+		
+			var teamAPlayer1Name = document.querySelector('#'+key+'teamAPlayer1Name');
+			var teamAPlayer2Name = document.querySelector('#'+key+'teamAPlayer2Name');
+			
+			var teamBPlayer1Name = document.querySelector('#'+key+'teamBPlayer1Name');
+			var teamBPlayer2Name = document.querySelector('#'+key+'teamBPlayer2Name');
+			
+			var child = game.child(key);
+			
+			child.update({		teamASchCode : teamASchCode.value,
+								teamBSchCode : teamBSchCode.value,
+								teamAPlayer1Name : teamAPlayer1Name.value,
+								teamAPlayer2Name : teamAPlayer2Name.value,
+								teamBPlayer1Name : teamBPlayer1Name.value,
+								teamBPlayer2Name : teamBPlayer2Name.value
+								});
+		}
+		function resetGame(key){
+			var test = confirm("Reset "+key+"?");
+			if(test)
+			{
+				var child = game.child(key);
+				
+				child.update({		teamAPlayer1Name : "",
+									teamAPlayer2Name : "",
+									teamBPlayer1Name : "",
+									teamBPlayer2Name : "",
+									gameCurrentSet : 1,
+									teamAScore : 0,
+									teamBScore : 0,
+									});
+									
+				var set1 = child.child("set1");
+				set1.update({		teamASetScore : 0,
+									teamBSetScore : 0,
+									});
+									
+				var set2 = child.child("set2");
+				set2.update({		teamASetScore : 0,
+									teamBSetScore : 0,
+									});
+																	
+				var set3 = child.child("set3");
+				set3.update({		teamASetScore : 0,
+									teamBSetScore : 0,
+									});
+																	
+				var set4 = child.child("set4");
+				set4.update({		teamASetScore : 0,
+									teamBSetScore : 0,
+									});
+																	
+				var set5 = child.child("set5");
+				set5.update({		teamASetScore : 0,
+									teamBSetScore : 0,
+									});
+			}
+		}
+		
+        
+    </script>
+</body>
+<footer class="footer navbar-bg">
+	<div class="footer-left"><p><img src="img/SITGEEKS_LOGO.png" class="footer-img" alt=" " />Powered by SIT Geeks</p></div>
+	<div class="footer-right">Singapore University Games - Table Tennis</div>
+</footer>
+
+</html>

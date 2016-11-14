@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>SIT Scoreboard</title>
+<script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+
+<style type="text/css">
+.clear-fix {
+	clear: both;	
+}
+
+.vcenter {
+	position: relative;
+	top: 5vh;
+}
+
+body {
+	text-align: center;
+	overflow: hidden;
+	background-color: #333333;
+}
+
+.navbar {
+	margin-bottom: 0px;
+}
+
+.navbar-bg {
+	background: #466B82;
+}
+
+.header-banner {
+	line-height: 1.6em;
+	font-size: 2em;
+	color: white;
+}
+
+.A-score-board, .B-score-board {
+	margin-top: 3vw;
+	margin-bottom: 2vw;
+}
+
+.A-logo, .B-logo {
+	height: 8vw;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.A-sch-logo, .B-sch-logo {
+	background: white;
+}
+
+.A-sch-code, .B-sch-code {
+	font-size: 3em;
+}
+
+.A-player1-name, .A-player2-name, .B-player1-name, .B-player2-name {
+	font-size: 2vw;
+	color: white;
+}
+
+.A-score, .B-score {
+	margin: auto;
+  width: 20vw;
+  height: 20vw;
+	background: #000;
+	font-size: 7em;
+	border: solid 1px #000;
+}
+
+.A-score>p, .B-score>p {
+	position: relative;
+	font-size: 14vw;
+	top: 0vh;
+}
+
+.A-score > p {
+	color: #37F531; /* yellow */
+}
+
+.B-score > p {
+	color: #37F531; /* lime green */
+}
+
+.A-set-score {
+	float:right;
+	font-size: 3vw;
+	background: #E3E3E3;
+	width: 4vw;
+	border: solid 1px #000;	
+	margin-right: 2.5vw;
+	margin-top: -20vw;
+}
+
+.B-set-score {
+	float: left;
+	font-size: 3vw;
+	background: #E3E3E3;
+	width: 4vw;
+	border: solid 1px #000;
+	margin-left: 2.5vw;
+	margin-top: -20vw;
+}
+
+.sidebar {
+	background: #4D4D4D;
+	height: 100vh;
+	padding: 0;
+	position: relative;
+	top: -20px;
+	color: #F2F2F2;
+}
+
+.sidebar-img {
+	margin-top: 1vw;
+	width: 10vw;
+}
+
+#previous-header {
+	border: solid 1px #949494;
+	padding: 10px;
+	margin: 15px 30px 15px 15px;
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.previous-sets>ol {
+  counter-reset: item;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.previous-sets>ol>li {
+	background: #000;
+	display: block;	
+	font-size: 5vh;
+	line-height: 2em;
+	margin-bottom: 15px;
+	vertical-align: middle;
+	clear: both;
+	height: 10vh;
+}
+
+.previous-sets>ol>li:before {
+	display:block;
+	height: 10vh;
+	padding-left: 5vh;
+	padding-right: 5vh;
+	background: #666666;
+	float: left;
+	content: counter(item) "  "; 
+	counter-increment: item;
+	font-weight: bolder;
+}
+
+.prev-set-sch-wrapper {
+	padding-left: 6vw;
+}
+
+.previous-sets>ul {
+  counter-reset: item;
+  list-style-type: none;
+  padding-left: 0;	
+}
+
+.previous-sets>ul>li {
+	display: block;	
+	font-size: 3vh;
+	vertical-align: middle;
+	clear: both;
+	height: 5vh;	
+}
+
+.prev-set {
+	display: inline-block;
+}
+
+.prev-set[data-set*="A-set"] {
+	float: left;
+	padding-left: 18%;
+}
+
+.prev-set[data-set*="B-set"] {
+	float: right;
+	padding-right: 20%;
+}
+
+.center-line {
+	border-left: 1px solid #000;
+}
+
+.footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 60px;	
+}
+
+.footer-left, .footer-right {
+	color: white;
+	font-size: 1.4vw;
+	padding-top: 10px;
+}
+
+.footer-left {
+	float: left;
+	padding-left: 20px;
+}
+
+.footer-right {
+	float: right;
+	padding-right: 20px;
+}
+
+.footer-img {
+	width: 4vw;
+}
+.offline {
+      width: 50px;
+      height: 50px;
+      -webkit-border-radius: 25px;
+      -moz-border-radius: 25px;
+      border-radius: 25px;
+      background: red;
+	  float : right;
+}
+.online {
+      width: 10px;
+      height: 10px;
+      -webkit-border-radius: 25px;
+      -moz-border-radius: 25px;
+      border-radius: 25px;
+      background: green;
+	  float : right;
+	  margin-left: 10px;
+}
+
+</style>
+
+<body>
+
+<div class="row">
+	<div class="col-lg-12">
+		<div class="navbar navbar-bg">
+			<!-- <a class="navbar-brand" href="#">Welcome to SUniG Table Tennis</a> -->
+			<div class="header-banner">
+				MEN - SINGLES
+			</div>
+			
+
+		</div>		
+	</div>
+</div>
+<div class="clear-fix"></div>
+<div id = "selectionPhase">
+	<select id = "selectCowList">
+	  <option value="cow1">Cow 1</option>
+	  <option value="cow2">Cow 2</option>
+	  <option value="cow3">Cow 3</option>
+	  <option value="cow4">Cow 4</option>
+	  <option value="cow5">Cow 5</option>
+	  <option value="cow6">Cow 6</option>
+	  <option value="cow7">Cow 7</option>
+	  <option value="cow8">Cow 8</option>
+	</select>
+	<button id="btnSelect" >Select Station</button>
+</div>
+<!-- body -->
+<div id = "gamePhase" style="display: none;" class="row">
+
+	<!-- main content -->
+	<div class="col-sm-9">
+		<div class="col-sm-6 vcenter">
+			<div class="A-sch-logo"><img src="" alt=" " class="A-logo"/></div>
+			<!-- <div class="A-sch-code">NTU</div> -->
+			<div class="A-score-board">
+				<div class="A-score"><p id = "A-score"></p></div>
+				<div class="A-set-score"></div>	
+			</div>
+			
+			<div class="A-player1-name"></div>
+			<div class="A-player2-name"></div>
+			
+		</div>
+
+		<div class="col-sm-6 vcenter center-line">
+			<div class="B-sch-logo"><img src="" alt=" " class="B-logo"/></div>
+			<!-- <div class="B-sch-code">SIT</div> -->
+			<div class="B-score-board">
+				<div class="B-score"><p id = "B-score"></p></div>
+				<div class="B-set-score"></div>	
+			</div>
+
+			<div class="B-player1-name"></div>
+			<div class="B-player2-name"></div>
+		</div>
+	</div>
+
+	<!-- right sidebar -->
+	<div class="col-sm-3 sidebar">
+		<div class="clear-fix"></div>
+		<div class="previous-sets">
+
+			<div class="sidebar-logo">
+				<img src="img/SUNIG_logo.jpg" class="sidebar-img">
+			</div>
+
+			<h2 id="previous-header">Previous Set Scores</h2>
+			
+			<ul>
+				<li>
+					<div class="prev-set-sch-wrapper">
+						<div id = "A-set-sch" class="prev-set" style="padding-left:65px;" data-set="A-set-sch" class="text-center"></div>						
+						<div id = "B-set-sch" class="prev-set" style="padding-right:75px;" data-set="B-set-sch"></div>
+					</div>
+					
+				</li>
+			</ul>
+
+			<ol>
+				<li><div id = "A-set-1" class="prev-set" data-set="A-set-1"></div> - <div id = "B-set-1" class="prev-set" data-set="B-set-1"></div></li>
+				<li><div id = "A-set-2" class="prev-set" data-set="A-set-2"></div> - <div id = "B-set-2" class="prev-set" data-set="B-set-2"></div></li>
+				<li><div id = "A-set-3" class="prev-set" data-set="A-set-3"></div> - <div id = "B-set-3" class="prev-set" data-set="B-set-3"></div></li>
+				<li><div id = "A-set-4" class="prev-set" data-set="A-set-4"></div> - <div id = "B-set-4" class="prev-set" data-set="B-set-4"></div></li>
+			</ol>
+		</div>
+
+		
+	</div>
+</div>
+
+
+
+<footer class="footer navbar-bg">
+	<div class="footer-left"><p><img src="img/SITGEEKS_LOGO.png" class="footer-img" alt=" " />Powered by SIT Geeks</p></div>
+	<div class="footer-right">Singapore University Games - Table Tennis<div id="status" class = "online"></div></div>
+</footer>
+
+</body>
+</html>
+
+	<script>
+		//respective Divs and query selectors
+		var divSelectionPhase = document.querySelector('#selectionPhase');
+		var divGamePhase = document.querySelector('#gamePhase');
+		
+		var selectCowList = document.querySelector('#selectCowList');
+		var btnSelect = document.querySelector('#btnSelect');
+		
+		var gameCurrentSet = document.querySelector('.gameCurrentSet');
+		var gameStatus = document.querySelector('.gameStatus');
+		var gameToggle = document.querySelector('.gameToggle');
+		var gameType = document.querySelector('.header-banner');
+		var gameMatchNumber = document.querySelector('.match-number');
+		
+		var teamASchLogo = document.querySelector('.A-logo');
+		var teamAPlayer1Name = document.querySelector('.A-player1-name');
+		var teamAPlayer2Name = document.querySelector('.A-player2-name');
+		var teamASchScore = document.querySelector('.A-set-score');
+		var teamADisplayScore = document.querySelector('#A-score');
+		
+		var teamBSchLogo = document.querySelector('.B-logo');
+		var teamBPlayer1Name = document.querySelector('.B-player1-name');
+		var teamBPlayer2Name = document.querySelector('.B-player2-name');
+		var teamBSchScore = document.querySelector('.B-set-score');
+		var teamBDisplayScore = document.querySelector('#B-score');
+		
+		var teamASetSch = document.querySelector('#A-set-sch');
+		var teamBSetSch = document.querySelector('#B-set-sch');
+		
+		var teamASet1Score = document.querySelector('#A-set-1');
+		var teamASet2Score = document.querySelector('#A-set-2');
+		var teamASet3Score = document.querySelector('#A-set-3');
+		var teamASet4Score = document.querySelector('#A-set-4');
+		
+		var teamBSet1Score = document.querySelector('#B-set-1');
+		var teamBSet2Score = document.querySelector('#B-set-2');
+		var teamBSet3Score = document.querySelector('#B-set-3');
+		var teamBSet4Score = document.querySelector('#B-set-4');
+		
+		var status = document.querySelector('#status');
+		
+		//Simple Button selector , allows choosing of station , removing the option after
+		btnSelect.addEventListener('click', function() {
+			var cowID = selectCowList.options[ selectCowList.selectedIndex ].value;
+			getAndDisplayGameInfo(cowID);
+			alert( cowID +" has been selected");
+			divSelectionPhase.style.display = "none";
+			divGamePhase.style.display = "inline";
+		}, false);
+
+		
+		
+		
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyDD_xwwUaL9QqUmr3e5qRWrBkyLLnjk0Io",
+			authDomain: "sitscore.firebaseapp.com",
+			databaseURL: "https://sitscore.firebaseio.com",
+			storageBucket: "sitscore.appspot.com",
+		};
+		firebase.initializeApp(config);
+		
+		var myFirebase = firebase.database().ref();
+		
+		//primary function for retriving values based on a cow id
+		function getAndDisplayGameInfo(cowID)
+		{
+			var gameRef = firebase.database().ref(cowID);
+			gameRef.on('value', function(snapshot) {
+				var key = snapshot.key;
+				var obj = snapshot.val();
+				
+				toggleUI(obj.gameToggle);
+				var gameCurrentSet = obj.gameCurrentSet;
+				
+				gameType.innerHTML = obj.gameGender+" - "+obj.gameType;
+				
+				teamASchLogo.src = "img/"+obj.teamASchCode+"_logo.png";//Note : MUST BE MATCHING with all CAPS
+				teamAPlayer1Name.innerHTML = obj.teamAPlayer1Name;
+				teamAPlayer2Name.innerHTML = obj.teamAPlayer2Name;
+				teamASchScore.innerHTML = obj.teamAScore;
+				
+				teamBSchLogo.src = "img/"+obj.teamBSchCode+"_logo.png";//Note : MUST BE MATCHING with all CAPS
+				teamBPlayer1Name.innerHTML = obj.teamBPlayer1Name;
+				teamBPlayer2Name.innerHTML = obj.teamBPlayer2Name;
+				teamBSchScore.innerHTML = obj.teamBScore;
+				
+				teamASetSch.innerHTML = obj.teamASchCode;
+				teamBSetSch.innerHTML = obj.teamBSchCode;
+				
+				var gender = obj.gameGender;
+
+				if(gender == "MEN"){
+					
+				}else{
+					var color = document.querySelector(".navbar-bg");
+					var footer = document.querySelector(".footer");
+					color.style.background = "maroon";
+					footer.style.background = "maroon";
+				}
+
+				displayRespectiveSets(obj.gameCurrentSet , obj.set1 , obj.set2 , obj.set3 , obj.set4 , obj.set5)
+				updateRightScore(obj.set1 , obj.set2 , obj.set3 , obj.set4 , obj.set5)
+				
+			});
+		}
+		
+		//perform logic of displaying sets
+		function displayRespectiveSets(gameCurrentSet, set1,set2,set3,set4,set5)
+		{
+			switch(gameCurrentSet)
+			{	
+				case 1:
+						updateCurrentScore(set1.teamASetScore,set1.teamBSetScore);
+						break;
+				case 2:
+						updateCurrentScore(set2.teamASetScore,set2.teamBSetScore);
+						break;
+				case 3:
+						updateCurrentScore(set3.teamASetScore,set3.teamBSetScore);
+						break;
+				case 4:
+						updateCurrentScore(set4.teamASetScore,set4.teamBSetScore);
+						break;
+				case 5:
+						updateCurrentScore(set5.teamASetScore,set5.teamBSetScore);
+						break;
+					
+			}
+		}
+		
+		//update the current score of the respective displays
+		function updateCurrentScore(A,B)
+		{
+			teamADisplayScore.innerHTML = A;
+			teamBDisplayScore.innerHTML = B;
+		}
+		
+		//swops the UI by swopping the respective elements
+		function toggleUI(gameToggle)
+		{
+			if (gameToggle)
+			{
+				teamASchLogo = document.querySelector('.B-logo');
+				teamAPlayer1Name = document.querySelector('.B-player1-name');
+				teamAPlayer2Name = document.querySelector('.B-player2-name');
+				teamASchScore = document.querySelector('.B-set-score');
+				teamADisplayScore = document.querySelector('#B-score');
+				
+				teamBSchLogo = document.querySelector('.A-logo');
+				teamBPlayer1Name = document.querySelector('.A-player1-name');
+				teamBPlayer2Name = document.querySelector('.A-player2-name');
+				teamBSchScore = document.querySelector('.A-set-score');
+				teamBDisplayScore = document.querySelector('#A-score');
+			}
+			else
+			{
+				teamASchLogo = document.querySelector('.A-logo');
+				teamAPlayer1Name = document.querySelector('.A-player1-name');
+				teamAPlayer2Name = document.querySelector('.A-player2-name');
+				teamASchScore = document.querySelector('.A-set-score');
+				teamADisplayScore = document.querySelector('#A-score');
+				
+				teamBSchLogo = document.querySelector('.B-logo');
+				teamBPlayer1Name = document.querySelector('.B-player1-name');
+				teamBPlayer2Name = document.querySelector('.B-player2-name');
+				teamBSchScore = document.querySelector('.B-set-score');
+				teamBDisplayScore = document.querySelector('#B-score');
+			}
+		}
+        
+		
+		//update the right side scores accordingly , set 5 is no longer used
+		function updateRightScore(set1,set2,set3,set4,set5)
+		{
+			formatScore(teamASet1Score,teamBSet1Score,set1);
+			formatScore(teamASet2Score,teamBSet2Score,set2);
+			formatScore(teamASet3Score,teamBSet3Score,set3);
+			formatScore(teamASet4Score,teamBSet4Score,set4);
+		}
+		
+		//format the score for display 
+		function formatScore(setHolderA,setHolderB,set)
+		{
+			setHolderA.innerHTML = set.teamASetScore;
+			setHolderB.innerHTML = set.teamBSetScore;
+		}
+		
+		
+		window.addEventListener('load', function() {
+
+			function updateIndicatorOnline() {
+				// Show a different icon based on offline/online
+				status.className = "online";
+			}
+			function updateIndicatorOffline() {
+				// Show a different icon based on offline/online
+				status.className = "offline";
+			}
+
+			// Update the online status icon based on connectivity
+			window.addEventListener('online',  updateIndicatorOnline);
+			window.addEventListener('offline', updateIndicatorOffline);
+		});
+		
+    </script>
